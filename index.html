@@ -1,0 +1,81 @@
+<p id="p1">
+    <h2> a.) </h2>
+        <p> The marks in this graph would be the zones/regions that are defined by the light grey outlines. On the other hand, channels would include the colors used to define the estimated fraction of precipitation lost to evapotranspiration; the geographic map of the United States to illustrate where the regions lie geographically; and the table of colors </p>
+    <h2> b.) </h2>
+        <p> The marks in the "Ingredient-Based PCA of Recipes" would be the individual dots on the chart. Channels include: the colors differentiating the dots from the cookies, pastries, and pizzas; and the numbered x,y axis and corresponding labels
+            </p>
+</p>
+
+<p id="p2">
+    <p>a. Regex - cannot be returned </p>
+    <p>b. String - can be returned </p>
+        <script>
+            console.log(typeof("hello"));
+        </script>
+    <p>c. Unicode - cannot be returned</p>
+    <p>d. List - cannot be returned </p>
+    <p>e. Map - cannot be returned</p>
+    <p>f. Object - can be returned</p>
+        <script>
+            let x = ["hi","hello","no"];
+            console.log(typeof(x));
+        </script>
+    <p>g. Number - can be returned</p>
+        <script>
+            console.log(typeof(2));
+        </script>
+    <p>h. Int - cannot be returned</p>
+    <p>i. Boolean - can be returned</p>
+        <script>
+            console.log(typeof(true));
+        </script>
+    <p>j. Float - cannot be returned </p>
+    <p>k. Null - cannot be returned, but is a type that returns as object </p>
+        <script>
+            
+        </script>
+    <p>l. Function - can be returned </p>
+        <script>
+            function example() {
+                let y = "hello";
+            };
+            console.log(typeof(example));
+        </script>
+    </p>
+
+<p id="p3">
+    <p> '{ "netid": ‘jmr395’ }' A JSON string is converted to a map/dictionary when parsed, which means that the resulting key value must be initially a string. Adding "" around 'netid' solves this problem</p>
+        <script>
+            JSON.parse('{"netid":"jmr395"}');
+            console.log(JSON.parse('{"netid":"jmr395"}'));
+        </script>
+
+    <p> '{"comment": "choose one of these options", "number": "INFO3300/CS3300/INFO5100"}' JSON string doesn't take in comments, but comments can be recorded with its own separate key </p>
+        <script>
+            console.log(JSON.parse('{"comment": "choose one of these options", "number": "INFO3300/CS3300/INFO5100"}'));
+        </script>
+
+    <p>'{"numbers": [3, 4.3, null]}' JSON must be a string version of a dictionary, but the given statement is an array. To convert this to a JSON string, the user needs to assign a key to each of the values. In addition, this array must be written as a string </p>
+        <script>
+            console.log(JSON.parse('{"numbers": [3, 4.3, null]}'));
+        </script>
+
+    <p> '{"classes": [ { "name": "DDWA", "number": 3300 } { "name": "Java", "number": 2110 } { "name": "Python", "number"; 1110 } ]}' This JSON string is missing an end bracket at the end and the entire dictionary must be nested within another key. There are also missing commas between the nested entries and a semi-colon instead of colon after the "number" key for the Python class </p>
+        <script>
+            console.log(JSON.parse('{"classes": [{"name": "DDWA", "number": 3300 }, { "name": "Java", "number": 2110 }, { "name": "Python", "number": 1110 }]}'));
+        </script>
+    
+    <p></p>
+
+<p id="p4">
+    <p>let json = "{}"</p>
+    <script>
+        let json = '{"example":[{"id":1,"bool":false,"list":["hi","hello"]}, {"id":2,"bool":true,"list":["no","yes"]}, {"id":3,"bool":false,"list":["horses","dogs"]}]}';
+        console.log(JSON.parse(json));
+    </script>
+</p>
+
+<p id=p5>
+    <p> Assignments will be given a zero if they are submitted late or submitted with incorrect content; however, the two lowest homework grades will be dropped. The best policy is to provide a timestamped version of the homework in the case that the file cannot be opened</p>
+</p>
+</p>
