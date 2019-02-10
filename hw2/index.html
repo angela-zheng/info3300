@@ -1,3 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <script type="text/javascript" src="https://d3js.org/d3.v5.min.js">
+    </script>
+</head>
+
+<body>
+<h1> Homework 2 </h1>
+<h3> Problem 1 </h3>
 <p id="p1">
     <svg height=200 width=200>
         <text 
@@ -13,3 +24,126 @@
             r="5"/>
     </svg>
 </p>
+
+<h3> Problem 2</h3>
+<p id="p2">
+   <svg id="graph" width="300" height="200">
+       <rect x=15 y=15 width="270" height="180" style="stroke:lightgrey; fill:none"/>
+   </svg> 
+   <script>
+        // function to plot given x,y points on the specified graphs 
+        function plot(x,y) {
+            let graph = d3.select("#graph");
+            // have to convert x to pixel 
+            let adjX = 270/15*x+15;
+            let adjY = 180-(y*(180/10))+15;
+            graph.append("circle")
+                .attr("cx",adjX)
+                .attr("cy",adjY)
+                .attr("r",2)
+                .attr("fill", "blue");
+        }
+    
+        let graph = d3.select("#graph");
+        for (x_start=15; x_start<300; x_start=x_start+270/15){
+            var x=x_start.toString();
+            let direction = "m "+x+" 15 v 0 180";
+            console.log(direction);
+            graph.append("path")
+                .attr("d",direction)
+                .attr("style","stroke:lightgrey");
+            if (x_start==15) {
+                graph.append("text")
+                    .text("0")
+                    .attr("x",20)
+                    .attr("y",200)
+                    .attr("style","font-size:10px;")
+            }
+            if (x_start==(270/15*5)+15) {
+                graph.append("text")
+                    .text("5")
+                    .attr("x",(270/15*5)+10)
+                    .attr("y",200)
+                    .attr("style","font-size:10px")
+            }
+            if (x_start==(270/15*10)+15) {
+                graph.append("text")
+                    .text("10")
+                    .attr("x",(270/15*10)+10)
+                    .attr("y",200)
+                    .attr("style","font-size:10px")
+            }
+            if (x_start==(270/15*15)+15) {
+                graph.append("text")
+                    .text("15")
+                    .attr("x",(270/15*15)+10)
+                    .attr("y",200)
+                    .attr("style","font-size:10px")
+            }
+        };
+    
+        for (y_start=15; y_start<270; y_start=y_start+180/10){
+            var y= y_start.toString();
+            let d = "m 15 "+y+" h 0 270";
+            graph.append("path")
+                .attr("d",d)
+                .attr("style","stroke:lightgrey");
+            if (y_start==195) {
+                graph.append("text")
+                    .text("0")
+                    .attr("style","font-size:10px")
+                    .attr("x",5)
+                    .attr("y",195);
+             }
+            if (y_start==105) {
+                graph.append("text")
+                    .text("5")
+                    .attr("style","font-size:10px")
+                    .attr("x",5)
+                    .attr("y",195/2+10);
+             }
+            if (y_start==15) {
+                graph.append("text")
+                    .text("10")
+                    .attr("style","font-size:10px")
+                    .attr("x",5)
+                    .attr("y",20);
+             }
+        
+        }
+        plot(10,9.14);
+        plot(8,8.14);
+        plot(13,8.74);
+        plot(9,8.77);
+        plot(11,9.26);
+        plot(14,8.1);
+        plot(6,6.13);
+        plot(4,3.1);
+        plot(12,9.13);
+        plot(7,7.26);
+        plot(5,4.74);
+    </script>
+</p>
+
+<h3>Problem 3</h3>
+<p id="p3">
+    <svg id="piet" width=200 height=200>
+        <rect width=125 height=200 x=0 y=0 style="fill:blue;" />
+        <rect width=75 height=75 x=125 y=0 style="fill:green;" />
+        <rect width=75 height=125 x=125 y=75 style="fill:red;" />
+    </svg>
+    <script>
+        let colors = ["red","blue","green"];
+        let piet = d3.select("#piet");
+    </script>
+</p>
+
+</body>
+
+<style>
+        h1,h2,h3 {
+            font-family: "Palatino";
+            opacity: .85;
+        }
+    </style> 
+</html>
