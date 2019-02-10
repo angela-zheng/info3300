@@ -127,10 +127,20 @@
 
 <h3>Problem 3</h3>
 <p id="p3">
-    <svg id="piet" width=200 height=200>
-        <rect width=125 height=200 x=0 y=0 style="fill:blue;" />
-        <rect width=75 height=75 x=125 y=0 style="fill:green;" />
-        <rect width=75 height=125 x=125 y=75 style="fill:red;" />
+    <svg id="piet" width=200 height=200> 
+        <!-- draw rectangles -->
+        <rect width=125 height=200 x=0 y=0 style="fill:blue;"/>
+        <rect width=75 height=75 x=125 y=0 style="fill:green;"/>
+        <rect width=75 height=125 x=125 y=75 style="fill:red;"/>
+
+        <!-- draw lines -->
+        <line x1=0 y1=0 x2=0 y2=200 style="stroke:black; stroke-width:10px;"/>
+        <line x1=0 y1=0 x2=200 y2=0 style="stroke:black;stroke-width:10px;"/>
+        <line x1=200 y1=0 x2=200 y2=200 style="stroke:black;stroke-width:10px;"/>
+        <line x1=200 y1=200 x2=0 y2=200 style="stroke:black;stroke-width:10px;"/>
+        <line x1=125 y1=0 x2=125 y2=200 style="stroke:black;stroke-width:5;"/>
+        <line x1=125 y1=75 x2=200 y2=75 style="stroke:black;stroke-width:5;"/>
+
     </svg>
     <script>
         let colors = ["red","blue","green"];
