@@ -12,11 +12,11 @@
 <p id="p1">
     <svg height=200 width=200>
         <text 
-            x="100" y="100" 
+            x=50% y=50% dominant-baseline="middle" text-anchor="middle"
             style="font-family:Palatino; 
             fill:darkblue;
             text-shadow:2px 2px red;
-            font-size: 25px">INFO3300</text>
+            font-size: 18px">INFO3300</text>
         
         <circle 
             cx="100" cy="100"
@@ -148,10 +148,209 @@
     </script>
 </p>
 
+<h3>Problem 4</h3>
+<p id="p4">
+    <h4>A</h4>
+    <svg id="hist" width=350 height=200>
+    </svg>
+
+    <script>
+        let samples = [5, 1, 7, 3, 15, 10, 0, 10, 8, 5, 5, 2, 14, 6, 7, 6];
+        let freq = {};
+        for (var i=0; i<samples.length;i++){
+            // check if number at i index position is already in dict
+            if(samples[i] in freq) {
+                freq[samples[i]]+=1;
+            } else {
+                freq[samples[i]]=1;
+            }
+        }
+        console.log(freq);
+        // array of dictionary values 
+        let val =[]
+        for (var key in freq) {
+            val.push(freq[key]);
+        } 
+        console.log(val);
+        // let max = Math.max(val);
+        // largest freq value is 3, so largest y-val should be 4 
+        // graph size of 280x130
+        let hist = d3.select("#hist");
+        // draw lines 
+        hist.append("path")
+            .attr("d", "m 20 0 v 20 130")
+            .attr("style", "stroke:lightgrey; stroke-width:2px;");
+        hist.append("path")
+            .attr("d", "m 20 150 h 300 130")
+            .attr("style", "stroke:lightgrey; stroke-width:2px");
+        // pixels tall of one y-value 
+        let yIncPix=130/4;
+
+        // for (let index=1;index<4;i++) {
+        //     let d="m 20 "+130/4*index+" h 20 "
+        //     hist.append("path")
+        //         .attr("d", )
+        // }
+        // number of yVals = 11
+        // function for drawing rectangles 
+
+        let rectW = 200/11;
+        function rect(value,frequency) {
+            let h=frequency*yIncPix;
+            let x_coord=value*rectW+20;
+            hist.append("rect")
+                .attr("height",h)
+                .attr("width",rectW)
+                .attr("x",x_coord)
+                .attr("y",150-h)
+                .attr("style","fill:pink; stroke:lightgrey; stroke-width:2px;")
+        }
+        // create dictionary of value:frequency 
+        let valFreq={};
+        for (let v=0; v<16; v++) {
+            if (v in samples) {
+                let counter=0;
+                for (let z=0;z<samples.length;z++) {
+                    if (v == samples[z]) {
+                        counter=counter+1;
+                    }
+                }
+                valFreq[v]=counter
+            } else {
+                valFreq[v]=0
+            }
+        }
+        console.log(valFreq);
+
+        for (var k in valFreq) {
+            rect(k,valFreq[k]);
+        }
+
+        // x labels
+        let xCurrent=rectW/2;
+        for (let index=0;index<16;index++){
+            let xOffset= 16;
+            hist.append("text")
+                .text(index.toString())
+                .attr("x",xOffset+xCurrent)
+                .attr("y",160)
+                .style("font-size", "8px")
+                .style("font-family", "Palatino");
+            xCurrent=xCurrent+rectW;
+        };
+
+        // y labels 
+        let yCoord = 182-yIncPix;
+
+        for (let index=0; index<5; index++) {
+            hist.append("text")
+                .text(index.toString())
+                .attr("x",10)
+                .attr("y", yCoord)
+                .style("font-size","8px")
+                .style("font-family","Palatino");
+            hist.append("path")
+                .attr("d", "m 10 "+yCoord+" h 0 350")
+                .style("stroke","lightgrey");
+            yCoord=yCoord-yIncPix;
+        };
+
+        // x coord labels 
+        hist.append("text")
+            .text("Number Value in Sample")
+            .style("font-family","Palatino")
+            .style("font-size","12px")
+            .attr("x",100)
+            .attr("y", 180);
+        // y coord labels
+        hist.append("text")
+            .text("Frequency of Value")
+            .style("font-family","Palatino")
+            .style("font-size","12px")
+            .attr("writing-mode", "tb")
+            .attr("x",3)
+            .attr("y",10);
+    </script>
+
+    <h4 id="partB"> B </h4>
+    <!-- mean median mode std -->
+    <script>
+        let partB=d3.select("#partB");
+        let total = 0;
+        for (let num in samples) {
+            total=total+parseInt(num);
+        }
+        // mean
+        let mean=total/samples.length;
+        console.log("Sum" + total);
+        partB.append("p")
+            .attr("id","m")
+            .text("mean: "+mean);
+        // median 
+        let sorted = samples.sort(function(a,b){return a-b});
+        let medIndex = samples.length/2;
+        let med = sorted[medIndex];
+        partB.append("p")
+            .attr("id", "me")
+            .text("median: "+ med);
+        
+        // std
+        let totalV = 0;
+        for (let sortedIndex=0; sortedIndex<sorted.length;sortedIndex++) {
+            let variance=(mean-parseInt(sorted[sortedIndex]))**2;
+            totalV=totalV+variance;
+        }
+        let std = (totalV/sorted.length)**.5;
+        partB.append("p")
+            .attr("id", "std")
+            .text("standard deviation: " + std);
+
+        // mode 
+        let mode=5;
+        // plot line 
+        let xCoordMean=mean*rectW+20;
+        console.log(xCoordMean + " xCoordMean");
+        let xCoordMedian=med*rectW+20;
+        let xCoordMode=mode*rectW+20;
+        // hist.append("path")
+        //     .attr("d","m "+xCoordMean+" 0 v "+xCoordMean+" 0")
+        //     .style("stroke", "red")
+        //     .style("stroke-width", "2px");
+
+        hist.append("line")
+            .attr("x1", xCoordMean)
+            .attr("y1", 0)
+            .attr("x2",xCoordMean)
+            .attr("y2", 150)
+            .attr("style", "stroke:red;stroke-width:2px;");
+
+        hist.append("line")
+            .attr("x1", xCoordMedian)
+            .attr("y1", 0)
+            .attr("x2",xCoordMedian)
+            .attr("y2", 150)
+            .attr("style", "stroke:blue;stroke-width:2px;");
+        
+        hist.append("line")
+            .attr("x1", xCoordMode)
+            .attr("y1", 0)
+            .attr("x2",xCoordMode)
+            .attr("y2", 150)
+            .attr("style", "stroke:purple;stroke-width:2px;");
+        
+        hist.append("rect")
+            .attr("x", (mean-std)*rectW+20)
+            .attr("y", 0)
+            .attr("width", (2*std)*rectW)
+            .attr("height", 150)
+            .attr("style", "fill:blue; fill-opacity: .1;")
+    </script>
+
+</p>
 </body>
 
 <style>
-        h1,h2,h3 {
+        h1,h2,h3,h4 {
             font-family: "Palatino";
             opacity: .85;
         }
