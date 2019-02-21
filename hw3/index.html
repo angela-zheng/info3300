@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+    <header>
+        <meta charset="utf-8"/>
+        <script type="text/javascript" src="https://d3js.org/d3.v5.min.js">
+        </script>
+    </header>
+    <body>
+        <h1> Question 1 </h1>
+        <ul>
+            <li><b>A:</b> This is a sequential scale, because it shows a the progression of one hue from dark to light. This can be an effective color scale in certain applications such as for ordinal data; however, can be confusing for other data types</li>
+            <li><b>B.</b> This is not an effective color for the task at hand. First, the yellow and red are not of the same luminance value so that the yellow is perceived as brighter, which can lead to bias in the prominance of negative numbers as the eye is more drawn to yellow. In addition, the blue is not a neutral tone between yellow and red; therefore, it is not an intuitive 'zero'/middle ground </li>
+            <li><b>C.</b> For this spectrum, the color-blindness test revealed that people with Red-Blind/Protanopia and Green-Blind/Deueranopia as well as Monochromacy. Used: https://www.color-blindness.com/coblis-color-blindness-simulator/. </li>
+            <li><b>D.</b> I would not recommend using this color scale, as there are a large variety of colors of different luminances, which lead to differing perceptions of brighteness. The teal and yellow appear brighter, and tip the balance of the scale, which leads to biases in perception and associations with the data's numerical values</li>
+        </ul>
+        <h1> Question 2 </h1>
+        <p id=2>
+            <svg id="graph" width="300" height="200">
+
+            </svg> 
+            <script>
+
+                let dataset = [[10, 9.14], [8, 8.14], [13, 8.74], [9, 8.77], [11, 9.26], [14, 8.1], [6, 6.13], [4, 3.1], [12, 9.13], [7, 7.26], [5, 4.74]];
+
+                let graph = d3.select("#graph");
+                let width = graph.attr("width");
+                let height = graph.attr("height");
+
+                let xValues = []
+                let yValues = []
+                dataset.forEach(function(d,i){xValues.push(d[0])});
+                dataset.forEach(function(d,i) {yValues.push(d[1])});
+                
+                // padding
+                let paddingLeft = 10;
+                let paddingTop = 10;
+
+                // find the max "y" value of the Anscombe's Quartet 
+                let maxX = d3.max(xValues, function(d){return Math.max(d)});
+                let maxY = d3.max(yValues, function(d){return Math.max(d)})
+
+                // get the x, y scales 
+                let xScale = d3.scaleLinear()
+                    .domain([0,maxX+1])
+                    .range([20,width]);
+                
+                let yScale = d3.scaleLinear()
+                    .domain([0,Math.round(maxY)+1])
+                    .range([0,height-20]);
+
+                // // draw x axis lines 
+                // for (let i=0; i<maxX+2; i++){
+                //     graph.append("line")
+                //         .attr("x1", xScale(i))
+                //         .attr("y1", 0)
+                //         .attr("x2", xScale(i))
+                //         .attr("y2", height-20)
+                //         .attr("style", "stroke:lightgrey; stroke-width: 1.5px");
+                // }
+
+                // // draw y axis lines
+                // for (let i=0; i<maxY+1; i++) {
+                //     graph.append("line")
+                //         .attr("x1", 0)
+                //         .attr("y1", yScale(i))
+                //         .attr("x2", width-20)
+                //         .attr("y2", yScale(i))
+                //         .attr("style", "stroke:lightgrey; stroke-width: 1.5px");
+                //     if (i==0) { // add labels 
+                //         graph.append("text")
+                //             .attr("x", 0)
+                //             .attr("y", height-15)
+                //             .text("0")
+                //     }
+                // }
+
+                // plot points 
+                for (let i=0; i<xValues.length; i++) {
+                    graph.append("circle")
+                        .attr("cx", xScale(xValues[i]))
+                        .attr("cy", (height-20)-yScale(yValues[i]))
+                        .attr("r", 3)
+                        .attr("style", "fill: blue")
+                        .on("click", function(){
+                            let c = d3.select(this);
+                            c.attr("style", "fill:red;");
+                        })
+                }
+                
+                // referenced dashingd3js.com for axis help 
+                let xAxis = d3.axisBottom().ticks(4)
+                    .scale(xScale);
+                let xAxisGroup = graph.append("g")
+                    .attr("class", "xAxis")
+                    .attr("transform", "translate(20,"+(height-20)+")")
+                    .call(xAxis);
+                
+                let yAxis = d3.axisLeft().scale(yScale).ticks(3);
+                let yAxisGroup = graph.append("g")
+                    .attr("class", "yAxis")
+                    .attr("transform", "translate(20,0)")
+                    .call(yAxis);
+
+                // gridlines (refernced stackOverFlow)
+                let xGridScale = d3.scaleLinear()
+                    .domain([0,maxX])
+                    .range([20,width]);
+
+                let yGridScale = d3.scaleLinear()
+                    .domain([0,Math.round(maxY)])
+                    .range([0,height-20]);
+
+                let xGrid = d3.axisBottom(xGridScale).tickSize(height)           .tickFormat("");
+                graph.append("g")
+                    .call(xGrid);
+                
+                let yGrid = d3.axisRight(yScale).tickSize(width).tickFormat("");
+                graph.append("g")
+                    .call(yGrid);
+
+             </script>
+             <style>
+                path, line {
+                    stroke: lightgrey;
+                    stroke-width: 1.5px;
+                }
+             </style>
+        </p>
+
+        <p id="q3">
+            <h1> Question 3 </h1>
+            <!-- A. load data (referenced developer.mozilla.org, javascript.info-->
+            <script>
+                const error = "file not found";
+                var diamondData;
+                let topPadding = 5;
+                let q3 = d3.select("#q3");
+
+                let svg = q3.append("svg")
+                            .attr("height", 400)
+                            .attr("width", 400)
+                            .attr("id", "q3svg");
+
+                let svgWidth = svg.attr("width");
+                let svgHeight = svg.attr("height");
+
+                let svg2 = q3.append("svg")
+                            .attr("height", 400)
+                            .attr("width", 400)
+                
+                let svg3 = q3.append("svg")
+                            .attr("height", 400)
+                            .attr("width", 400)
+
+                d3.json("diamonds.json")
+                    .then(function(data) {
+                        diamondData = data;
+                    
+                        carats = [];
+                        prices = [];
+                        console.log(carats);
+                        console.log(prices);
+                        // B. 
+                        diamondData.forEach(function(d,i) {carats.push(d['carat'])});
+                        diamondData.forEach(function(d,i) {prices.push(d['price'])});
+                    
+                        let maxCarat = d3.max(carats, function(d){return Math.max(d)});
+                        let maxPrice = d3.max(prices, function(d) {return Math.max(d)});
+
+                        console.log("maxCarat: " + maxCarat);
+                        console.log("maxPrice: " + maxPrice);
+
+                        let caratScale = d3.scaleLinear()
+                            .domain([0,Math.round(maxCarat)])
+                            .range([0,350]);
+                        
+                        let priceScale = d3.scaleLinear()
+                            .domain([Math.round(maxPrice),0])
+                            .range([0,350]);
+                        
+                        // x lines for Carats
+                        for (let i=0; i<maxCarat+1; i++) {
+                            svg.append("line")
+                                .attr("x1", caratScale(i))
+                                .attr("y1", topPadding)
+                                .attr("x2", caratScale(i))
+                                .attr("y2", svgHeight-50)
+                                .attr("style", "stroke:lightgrey; stroke-width: 1.5px");
+                        };
+
+                        // y lines for prices 
+                        for (let i=0; i<maxPrice; i=i+1000) {
+                            svg.append("line")
+                                .attr("x1", 0)
+                                .attr("y1", priceScale(i)+topPadding)
+                                .attr("x2", svgWidth-50)
+                                .attr("y2", priceScale(i))
+                                .attr("style", "stroke:lightgrey; storke-width: 1.5px");
+                        }
+
+                        diamondData.forEach(function(d,i){
+                            svg.append("circle")
+                                .attr("cx", Math.floor(caratScale(d['carat'])))
+                                .attr("cy", topPadding+Math.floor(priceScale(d['price'])))
+                                .attr("fill", "darkblue")
+                                .attr("style", "opacity:.4;")
+                                .attr("r", 3);
+                        });
+                        
+                        // D.
+                        let colorScale = d3.scaleLinear()
+                            .domain([0,8])
+                            .range([0,350]);
+
+                        // draw vertical lines 
+                        for (let i=0; i<9; i++){
+                            svg2.append("line")
+                                .attr("x1", colorScale(i))
+                                .attr("y1", topPadding)
+                                .attr("x2", colorScale(i))
+                                .attr("y2", svgHeight-50)
+                                .attr("style", "stroke:lightgrey; stroke-width: 1.5px");
+                        }
+
+                        // y lines for prices 
+                        for (let i=0; i<maxPrice; i=i+1000) {
+                            svg2.append("line")
+                                .attr("x1", 0)
+                                .attr("y1", topPadding+priceScale(i))
+                                .attr("x2", svgWidth-50)
+                                .attr("y2", priceScale(i))
+                                .attr("style", "stroke:lightgrey; storke-width: 1.5px");
+                        }
+
+                        // plot points 
+                        diamondData.forEach(function(d,i){
+                            let jitter1 = (Math.random()*10)-5;
+                            let jitter2 = (Math.random()*10)-5;
+                            svg2.append("circle")
+                                .attr("cx", Math.floor(colorScale(d['color_rating'])+jitter1))
+                                .attr("cy", topPadding+Math.floor(priceScale(d['price'])+jitter2))
+                                .attr("fill", "darkgreen")
+                                .attr("style", "opacity:.3;")
+                                .attr("r", 3);
+                        });
+
+                        // E. 
+
+                        // draw vertical lines 
+                        for (let i=0; i<9; i++){
+                            svg3.append("line")
+                                .attr("x1", colorScale(i))
+                                .attr("y1", topPadding)
+                                .attr("x2", colorScale(i))
+                                .attr("y2", svgHeight-50)
+                                .attr("style", "stroke:lightgrey; stroke-width: 1.5px");
+                        }
+
+                        pricePerCarats = []
+                        diamondData.forEach(function(d,i){
+                            pricePerCarats.push(Number(d['price']/d['carat']));
+                        });
+                        console.log(pricePerCarats);
+                        let maxPricePerCarat = d3.max(pricePerCarats, function(d){return Math.max(d)});
+                        console.log(maxPricePerCarat);
+
+                        let perCaratScale = d3.scaleLinear()
+                            .domain([Math.round(maxPricePerCarat), 0])
+                            .range([0,350]);
+
+                        // y lines for prices 
+                        for (let i=0; i<maxPricePerCarat; i=i+1000) {
+                            svg3.append("line")
+                                .attr("x1", 0)
+                                .attr("y1", topPadding+perCaratScale(i))
+                                .attr("x2", svgWidth-50)
+                                .attr("y2", perCaratScale(i))
+                                .attr("style", "stroke:lightgrey; stroke-width: 1.5px");
+                        }
+
+                        // plot points 
+                        diamondData.forEach(function(d,i){
+                            let jitter1 = (Math.random()*10)-5;
+                            let jitter2 = (Math.random()*10)-5;
+                            let perCarat = Number(d['price']/d['carat']);
+                            svg3.append("circle")
+                                .attr("cx", Math.floor(colorScale(d['color_rating'])+jitter1))
+                                .attr("cy", topPadding+Math.floor(perCaratScale(perCarat)+jitter2))
+                                .attr("fill", "darkred")
+                                .attr("style", "opacity:.3;")
+                                .attr("r", 3);
+                        });
+
+                        console.log(diamondData);
+                    })
+                    .catch(function(e) { 
+                        throw new Error(error);
+                    });
+            </script>
+            <p> This chart might mislead a viewer, because it has a relatively uniform shape, which suggests that the price/carat is relatively the same across the different rating values. The high quality diamonds with high price/carat are outliers, which is non-intuitive. </p>
+        </p>
+    </body>
+</html>
