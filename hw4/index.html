@@ -5,10 +5,190 @@
         <script type="text/javascript" src="https://d3js.org/d3.v5.min.js">
         </script>
     </header>
+    <!-- explain procedure/ design rationale for each step-->
     <body>
         <p id="p1">
-            
+            <h3> A. </h3>
+            <p> Data issues found include worldwide gross values represented as strings and missing Genre values. To fix the worldwide gross values I used the replace method to get rid of dollar signs and commas then casted the value as Number. As for the missing Genre strings, I removed entries from the array that had empty strings and filtered out genres of "NA". I also replaced dashes in genres to account for dictionary key values in the color dictionary of genres and their associated colors</p> 
+            <svg id="movie_scatter" width=800 height=500>
+             <!-- x-Axis: year of release and Y: worldwide gross-->
+            </svg>
+            <p> Rationale explaining choice made in designing axis/scales</p>
+            <p> Write 2-3 sentences in your tag describing the possible benefits to users from this approach and identifying places in the chart where it may be ineffective or confusing (or, if you fixed them, what you did to improve the user experience).</p>
+
+            <script>
+                const error = "An error has occurred";
+                var blockbustersData; 
+
+                // start constructing graph
+                let scatter = d3.select('#movie_scatter');
+                let width = scatter.attr('width');
+                let height = scatter.attr('height');
+
+                let margins = {top:10, right:10, bottom:20, left:80};
+                let scatterWidth = width - (margins.right+margins.left);
+                let scatterHeight = height - (margins.top+margins.bottom);
+
+                let genreColors = {Sport:"red", War:'green', Fantasy:'yellow', Romance:'pink', Thriller:'magenta', Crime:'darkblue', Comedy:'aliceblue', Drama:'purple', SciFi:'orange', Action:'darkred', Adventure:'salmon', Animation:"crimson", Family: "deeppink", History: "springgreen", Horror:"cyan", Music:"sienna" }; // dictionary of genres and colors 
+
+                d3.json("blockbusters.json").then(function(data){
+                    blockbustersData = data;
+                    // console.log(blockbustersData);
+
+                    // filter and fix data
+                    // find maximum and minimum values
+                    // Need: year of release, gross in dollars, rating, genre 
+                    data.forEach((d,i)=>{
+                        d['year'] = Number(d['year']);
+                        d['worldwide_gross'] = Number(d['worldwide_gross'].replace(/\$|,/g,""));
+                        d['rating'] = String(d['rating']);
+                        d['imdb_rating'] = Number(d['imdb_rating']);
+                        d['rank_in_year'] = Number(d['rank_in_year']);
+                        d['Main_Genre'] = String(d['Main_Genre'].replace(/-/g, ""));
+                        d['title'] = String(d['title']);
+                        d['studio'] = String(d['studio']);
+                    });
+                    
+                    data = data.filter(d=>d['Main_Genre']!="" && d['Main_Genre']!="NA" && d['Main_Genre']!="N/A");
+
+                // Part B 
+                    // get min/max for year of release (x axis)
+                    const minYear = d3.min(data, d=>d['year']);
+                    const maxYear = d3.max(data, d=>d['year']);
+
+                    // create x-scales 
+                    const yearScale = d3.scaleLinear()
+                        .domain([minYear-1,maxYear+1])
+                        .range([0,scatterWidth]);
+
+                    // get min/max for worldwide gross (y axis) 
+                    const minGross = d3.min(data, d=>d['worldwide_gross']);
+                    const maxGross = d3.max(data, d=>d['worldwide_gross']);
+
+                    // create y-scales 
+                    const grossScale = d3.scaleLinear()
+                        .domain([(minGross-1), (maxGross+1)])
+                        .range([scatterHeight,0]);
+
+                    // imdb rating circle sizes 
+                    const minRating = d3.min(data, d=>d['imdb_rating']);
+                    const maxRating = d3.max(data, d=>d['imdb_rating']);
+
+                    // imdb rating scale 
+                    const ratingScale = d3.scaleLinear()
+                        .domain([minRating,maxRating])
+                        .range([1,10]);
+
+                    // create x-axis and labels 
+                    let xAxis = d3.axisBottom(yearScale);
+                    scatter.append('g')
+                        .attr('class', 'x axis')
+                        .attr('transform', 'translate('+margins.left+','+(scatterHeight+margins.top)+')')
+                        .call(xAxis);
+
+                    let xGrid = d3.axisBottom(yearScale).tickFormat("").tickSize(-scatterHeight);
+                    scatter.append('g')
+                        .attr('transform', 'translate('+margins.left+','+(margins.top+scatterHeight)+')')
+                        .call(xGrid);
+
+                    // create y-axis and labels 
+                    let yAxis = d3.axisLeft(grossScale).ticks(15,d3.format("$,.5r"));
+                    scatter.append('g')
+                        .attr('class', 'y axis')
+                        .attr('transform', 'translate('+margins.left+','+margins.top+')')
+                        .call(yAxis);
+                    let yGrid = d3.axisLeft(grossScale).tickSize(-scatterWidth).tickFormat("");
+
+                    scatter.append('g')
+                        .attr('transform', 'translate('+(margins.left)+','+(margins.top)+')' )
+                        .call(yGrid);
+                    console.log(data);
+                
+                // Part C 
+                    let scatterGroup = scatter.append('g')
+                        .attr('transform', 'translate('+(margins.left)+','+(margins.top)+')')
+                    
+                    data.forEach(function(d,i){
+                        let yr = yearScale(d['year']);
+                        let gr = grossScale(d['worldwide_gross']);
+                        let rtg = ratingScale(d['imdb_rating']);
+                        let clr = genreColors[String(d['Main_Genre'])];
+
+                        let circle=scatterGroup.append('circle')
+                            .attr('cx',yr)
+                            .attr('cy',gr)
+                            .attr('r',rtg)
+                            .attr('fill', clr)
+                            .attr('opacity',.4)
+                            .attr('title', d['title']);
+                // Part D (referenced class notes)
+                        circle.on('mouseover', function() {
+                            d3.select(this)
+                                .transition().duration(150)
+                                .attr('r', rtg*2);
+
+                            scatterGroup.append('text')
+                                .attr('id', d['title'].replace(/[ _\-,.:'#!\?]/g,""))
+                                .attr('x', yr-40)
+                                .attr('y', gr+20)
+                                .text(d['title']);
+                        });
+
+                        circle.on('mouseout', function() {
+                            d3.select(this)
+                                .transition().duration(150)
+                                .attr('r',rtg);
+                            d3.select('#'+d['title'].replace(/[ _\-,.:'#!\?]/g,"")).remove();
+                        })
+                    })
+                    // color depends on genre 
+                }).catch(function(e){
+                    throw new Error(error);
+                });
+                //console.log(blockbustersData);
+            </script>
         </p>
-    </body>
+
+        <p id='p2'>
+            <!-- 
+                - pitcher is 13 meters from wall 
+                - Wall is 20 meters tall and 4 meters thick 
+                - Other side of wall, filed is between [8,18]   meters away from wall and 25-35meters away from pitcher 
+                - anything landing at y=0 and between 8 and 18 meters from wall will be caught 
+                - gravity: downward accel at 3.71m/s/s 
+            -->
+
+            <!-- Part A -->
+            <svg id='motion' width=400 height=400>
+                <!-- 5 pixels in both x and y axes correspond to 1 meter -->
+                <g id='background' style='stroke:#000; stroke-width:2px; fill:none;'>
+                    <path d='M75 350 H 140 V 250 H 160 V 350 H 350'/>
+                    <circle id='pitcher' cx='75' cy='350' r='5' style='fill:#EEF'/>
+                    <rect id='target' x='200' y='350' width='50' height='10' style='fill:#FDD'/>
+                </g>'
+            </svg>
+
+            <script> 
+                const motionChart = d3.select('#motion');
+                const height = motionChart.attr('height');
+                const width = motionChart.attr('width');
+                
+                // linearScale that maps meters to pixels for x,y dimensions that map meters to pixels 
+                const xScale = d3.scaleLinear();
+                const yScale = d3.scaleLinear();
+             
+            // Part B 
+                // initalVelocity in meters/second and initial angle, returns array of objects 
+                function trajectory(initialVelocity, angle) {
+                    let obj = {};
+                    let xVelocity = initialVelocity*Math.cos(angle);
+                    let yVelocity = initialVelocity*Math.sin(angle);
+                    let xAcceleration = 0;
+                    let yAcceleration = -3.71/10;
+
+                }
+            </script>
+        </p>
+       </body>
     </html>
     
