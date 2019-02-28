@@ -7,14 +7,20 @@
     </header>
     <!-- explain procedure/ design rationale for each step-->
     <body>
+        <h1> Homework 4 </h1>
         <p id="p1">
             <h3> A. </h3>
             <p> Data issues found include worldwide gross values represented as strings and missing Genre values. To fix the worldwide gross values I used the replace method to get rid of dollar signs and commas then casted the value as Number. As for the missing Genre strings, I removed entries from the array that had empty strings and filtered out genres of "NA". I also replaced dashes in genres to account for dictionary key values in the color dictionary of genres and their associated colors</p> 
+            <h2> Scatter Plot of Year vs Gross </h2>
             <svg id="movie_scatter" width=800 height=500>
              <!-- x-Axis: year of release and Y: worldwide gross-->
             </svg>
-            <p> Rationale explaining choice made in designing axis/scales</p>
-            <p> Write 2-3 sentences in your tag describing the possible benefits to users from this approach and identifying places in the chart where it may be ineffective or confusing (or, if you fixed them, what you did to improve the user experience).</p>
+
+            <h3> B. </h3>
+            <p> In designing the axis scales and labels, I chose to use a log scale for the y-axis (Gross). I found that when experimenting between scaleLog and scaleLinear, I could see the individual data points better with scaleLog. The gross amount was displayed using the full billion amount a dollar sign to illustrate money valuation. I played around with the margin values to come up with a set that portrayed all the necessary information. For the years on this axis, I reformatted the numbers so that there were no commas and had ticks ranging from 1975-2020, because this was easier to read (this changed the max domain from 2018 to 2020)</p>
+
+            <h3> D. </h3>
+            <p> Benefits of this approach include the ability to identify the points on the graph and user engagement; however, it can still be difficult to asses what year and worldwide gross value the point is at as the the labels do not cover every possible x,y value. Some of the points are also small so I tried to increase relative sizes. I also added extra lines to make easier to see what the x,y values are</p>
 
             <script>
                 const error = "An error has occurred";
@@ -25,11 +31,11 @@
                 let width = scatter.attr('width');
                 let height = scatter.attr('height');
 
-                let margins = {top:10, right:10, bottom:20, left:80};
+                let margins = {top:10, right:20, bottom:20, left:95};
                 let scatterWidth = width - (margins.right+margins.left);
                 let scatterHeight = height - (margins.top+margins.bottom);
 
-                let genreColors = {Sport:"red", War:'green', Fantasy:'yellow', Romance:'pink', Thriller:'magenta', Crime:'darkblue', Comedy:'aliceblue', Drama:'purple', SciFi:'orange', Action:'darkred', Adventure:'salmon', Animation:"crimson", Family: "deeppink", History: "springgreen", Horror:"cyan", Music:"sienna" }; // dictionary of genres and colors 
+                let genreColors = {Sport:"red", War:'green', Fantasy:'goldenrod', Romance:'lime', Thriller:'magenta', Crime:'darkblue', Comedy:'mediumvioletred', Drama:'purple', SciFi:'orange', Action:'tomato', Adventure:'rebeccapurple', Animation:"crimson", Family: "deeppink", History: "springgreen", Horror:"cyan", Music:"sienna" }; // dictionary of genres and colors 
 
                 d3.json("blockbusters.json").then(function(data){
                     blockbustersData = data;
@@ -58,7 +64,7 @@
 
                     // create x-scales 
                     const yearScale = d3.scaleLinear()
-                        .domain([minYear-1,maxYear+1])
+                        .domain([minYear,2020])
                         .range([0,scatterWidth]);
 
                     // get min/max for worldwide gross (y axis) 
@@ -66,8 +72,8 @@
                     const maxGross = d3.max(data, d=>d['worldwide_gross']);
 
                     // create y-scales 
-                    const grossScale = d3.scaleLinear()
-                        .domain([(minGross-1), (maxGross+1)])
+                    const grossScale = d3.scaleLog()
+                        .domain([(minGross), (maxGross+500000000)])
                         .range([scatterHeight,0]);
 
                     // imdb rating circle sizes 
@@ -77,12 +83,11 @@
                     // imdb rating scale 
                     const ratingScale = d3.scaleLinear()
                         .domain([minRating,maxRating])
-                        .range([1,10]);
+                        .range([3,12]);
 
                     // create x-axis and labels 
-                    let xAxis = d3.axisBottom(yearScale);
+                    let xAxis = d3.axisBottom(yearScale).tickFormat(d3.format(4));
                     scatter.append('g')
-                        .attr('class', 'x axis')
                         .attr('transform', 'translate('+margins.left+','+(scatterHeight+margins.top)+')')
                         .call(xAxis);
 
@@ -94,7 +99,6 @@
                     // create y-axis and labels 
                     let yAxis = d3.axisLeft(grossScale).ticks(15,d3.format("$,.5r"));
                     scatter.append('g')
-                        .attr('class', 'y axis')
                         .attr('transform', 'translate('+margins.left+','+margins.top+')')
                         .call(yAxis);
                     let yGrid = d3.axisLeft(grossScale).tickSize(-scatterWidth).tickFormat("");
@@ -125,20 +129,41 @@
                         circle.on('mouseover', function() {
                             d3.select(this)
                                 .transition().duration(150)
-                                .attr('r', rtg*2);
+                                .attr('r', rtg*3.4);
 
                             scatterGroup.append('text')
-                                .attr('id', d['title'].replace(/[ _\-,.:'#!\?]/g,""))
+                                .attr('id', 'z' + d['title'].replace(/[& _\-,.:'#!\?]/g,""))
                                 .attr('x', yr-40)
                                 .attr('y', gr+20)
+                                .attr('style', 'font-size:14px;')
                                 .text(d['title']);
+                            
+                            let lines = scatterGroup.append('g');
+                            lines.append("line")
+                                .attr('id', 'extraLine')
+                                .attr('x1', yr)
+                                .attr('x2', yr)
+                                .attr('y1', gr)
+                                .attr('y2', scatterHeight)
+                                .attr('style', 'stroke:black; opacity:.7');
+
+                            lines.append("line")
+                                .attr('id', 'extraLine2')
+                                .attr('x1', 0)
+                                .attr('x2', yr)
+                                .attr('y1', gr)
+                                .attr('y2', gr)
+                                .attr('style', 'stroke:black; opacity:.7');
                         });
 
                         circle.on('mouseout', function() {
                             d3.select(this)
                                 .transition().duration(150)
                                 .attr('r',rtg);
-                            d3.select('#'+d['title'].replace(/[ _\-,.:'#!\?]/g,"")).remove();
+                            d3.select('#z'+d['title'].replace(/[& _\-,.:'#!\?]/g,"")).remove();
+                            d3.select('#extraLine').remove();
+                            d3.select('#extraLine2').remove();
+
                         })
                     })
                     // color depends on genre 
@@ -165,30 +190,178 @@
                     <path d='M75 350 H 140 V 250 H 160 V 350 H 350'/>
                     <circle id='pitcher' cx='75' cy='350' r='5' style='fill:#EEF'/>
                     <rect id='target' x='200' y='350' width='50' height='10' style='fill:#FDD'/>
-                </g>'
+                </g>
             </svg>
 
             <script> 
                 const motionChart = d3.select('#motion');
-                const height = motionChart.attr('height');
-                const width = motionChart.attr('width');
+                const motionMargins = {top:25, bottom:25, left:75};
+                const motionHeight = motionChart.attr('height') -(motionMargins.top+motionMargins.bottom);
+                const motionWidth = motionChart.attr('width')+motionMargins.left;
                 
                 // linearScale that maps meters to pixels for x,y dimensions that map meters to pixels 
-                const xScale = d3.scaleLinear();
-                const yScale = d3.scaleLinear();
-             
+                const xScale = d3.scaleLinear()
+                    .domain([0,motionWidth/5])
+                    .range([motionMargins.left,motionWidth]);
+                const yScale = d3.scaleLinear()
+                    .domain([0,motionHeight/5])
+                    .range([motionHeight,0]);
+                
             // Part B 
                 // initalVelocity in meters/second and initial angle, returns array of objects 
+                // googled to convert angles to radians 
                 function trajectory(initialVelocity, angle) {
-                    let obj = {};
-                    let xVelocity = initialVelocity*Math.cos(angle);
-                    let yVelocity = initialVelocity*Math.sin(angle);
-                    let xAcceleration = 0;
-                    let yAcceleration = -3.71/10;
+                    let array = [];
+                    let obj = {
+                        'xVelocity':initialVelocity*Math.cos(angle*(Math.PI/180)),
+                        'yVelocity':initialVelocity*Math.sin(angle*(Math.PI/180)),
+                        'xAcceleration':0,
+                        'yAcceleration':(-3.71/10),
+                        'x':0,
+                        'y':0,
+                        'ground':0 };
+                    // because the wall ends at (17,20) 
+                    array.push(obj);
+                    let yPos = obj['y'];
+                    let gndPos = obj['ground'];
 
+                    while (yPos >= gndPos) {
+                        let i = array.length-1;
+                        let oldObj = array[i];
+                        let newObj = {
+                            'xVelocity': oldObj['xVelocity']+oldObj['xAcceleration'],
+                            'yVelocity':oldObj['yVelocity']+oldObj['yAcceleration'],
+                            'xAcceleration':0,
+                            'yAcceleration':(-3.71/10),
+                            'x':oldObj['x']+(oldObj['xVelocity']*.1),
+                            'y':oldObj['y']+(oldObj['yVelocity']*.1)
+                        };
+                        // because the wall ends at (17,20) 
+                        if (newObj['x']>=(13) && newObj['x']<=(17)) {
+                            newObj['ground'] = 20; 
+                        } else {
+                            newObj['ground'] = 0;
+                        };
+                        gndPos = newObj['ground'];
+                        yPos = newObj['y'];
+                        array.push(newObj);
+                    };
+                    console.log(array);
+                    return array;
                 }
+                trajectory(14,75);
+
+            // Part C
+                // referenced: https://www.dashingd3js.com/svg-paths-and-d3js 
+                // function takes in array of objects and string containg color 
+                function plotTrajectory (array, colorString) {
+                    let drawLines = d3.line()
+                        .x(function(d){
+                            return xScale(d['x'])
+                        })
+                        .y(function(d){
+                            return yScale(d['y'])
+                        });
+
+                    motionChart.append('path')
+                        .attr('d', drawLines(array))
+                        .attr('style', 'stroke:'+colorString+'; stroke-width:5px; fill:none; opacity:.25');
+                    
+                    // travel time based on number of entries based on campuswire post https://campuswire.com/c/G3730333F
+                    // 1/10 s between each entry 
+                    let travelTime = (array.length-1)*(1/10);
+
+                    // euclidean distance (https://en.m.wikipedia.org/wiki/Euclidean_distance)
+                    let beginning = array[0];
+                    let end = array[array.length-1];
+                    let dist = euclidean(beginning.x, end.x, beginning.y, end.y);
+                    console.log(dist);
+                    
+                    // text string 
+                    let txt = '';
+                    let hit_or_miss = '';
+                    if (end.x>=25 && end.x<=35) {
+                        hit_or_miss = " HIT ";
+                    } else {
+                        hit_or_miss = " MISS ";
+                    }
+                    txt = txt + hit_or_miss + travelTime + "s " + dist + "meters "; 
+                    motionChart.append('text')
+                        .attr('x', xScale(end.x))
+                        .attr('y', yScale(end.y)-10)
+                        .text(txt)
+                        .attr('style', 'font-family:helvetica; font-size:10px')
+                };
+
+                // returns the euclidean distance between two points 
+                function euclidean(x1,x2,y1,y2) {
+                    // referenced StackOverflow to find "toFixed" method 
+                    return Math.sqrt(((x1-x2)**2)+((y1-y2)**2)).toFixed(2);
+                }
+            // Part D 
+                plotTrajectory(trajectory(14,75),'#abb043');
+                plotTrajectory(trajectory(18,82),'blue');
+                plotTrajectory(trajectory(10,65),'blue');
+            // Part E 
+
+            function trajectoryWithWind(initialVelocity, angle, accel) {
+                    let array = [];
+                    let obj = {
+                        'xVelocity':initialVelocity*Math.cos(angle*(Math.PI/180)),
+                        'yVelocity':initialVelocity*Math.sin(angle*(Math.PI/180)),
+                        'xAcceleration':accel/10,
+                        'yAcceleration':(-3.71/10),
+                        'x':0,
+                        'y':0,
+                        'ground':0 };
+                    // convert to radians * as per google 
+                    // because the wall ends at (17,20) 
+                    array.push(obj);
+                    let yPos = obj['y'];
+                    let gndPos = obj['ground'];
+
+                    while (yPos >= gndPos) {
+                        let i = array.length-1;
+                        let oldObj = array[i];
+                        let newObj = {
+                            'xVelocity': oldObj['xVelocity']+oldObj['xAcceleration'],
+                            'yVelocity':oldObj['yVelocity']+oldObj['yAcceleration'],
+                            'xAcceleration':0,
+                            'yAcceleration':(-3.71/10),
+                            'x':oldObj['x']+(oldObj['xVelocity']*.1),
+                            'y':oldObj['y']+(oldObj['yVelocity']*.1)
+                        };
+                        // because the wall ends at (17,20) 
+                        if (newObj['x']>=(13) && newObj['x']<=(17)) {
+                            newObj['ground'] = 20; 
+                        } else {
+                            newObj['ground'] = 0;
+                        };
+                        gndPos = newObj['ground'];
+                        yPos = newObj['y'];
+                        array.push(newObj);
+                    };
+                    console.log(array);
+                    return array;
+                }
+                plotTrajectory(trajectoryWithWind(13,80,1),'red');
+
             </script>
         </p>
        </body>
+       <style>
+           h1,h2,h3,p {
+               font-family: helvetica;
+               opacity: .75;
+           }
+           .tick, .domain {
+               color: lightgrey;
+           }
+
+           text {
+               font-family: Helvetica;
+               font-size:12px;
+           }
+       </style>
     </html>
     
