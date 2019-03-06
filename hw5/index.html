@@ -32,7 +32,11 @@
         <svg id='equalEarth' width=600 height=400></svg>
         <p id='1E'>
                 write about 3 sentences identifying a) an advantage of this Equal Earth projection, b) a draw-back of this projection or places where it might be misleading, and c) a specific example use case for which it would be well suited.
-            </p>
+        </p>
+        <svg id='conicEqualArea' width=600 height=400></svg>
+        <p id='1F'>
+                write about 3 sentences identifying a) an advantage of this Conic projection, b) a draw-back of this projection or places where it might be misleading, and c) a specific example use case for which it would be well suited.
+        </p>
     </p>
     <script>
 // 1A
@@ -40,6 +44,14 @@
         var merSvg = d3.select('#mercator');
         var merWidth = merSvg.attr('width');
         var merHeight = merSvg.attr('height');
+
+        var equalSvg = d3.select('#equalEarth');
+        var equalWidth = equalSvg.attr('width');
+        var equalHeight = equalSvg.attr('height');
+
+        var conicSvg = d3.select('#conicEqualArea');
+        var conicWidth = conicSvg.attr('width');
+        var conicHeight = conicSvg.attr('height');
 
         var world = d3.json('world_110m.json').then(function(load){
             var countries = topojson.feature(load, load.objects.countries);
@@ -62,10 +74,8 @@
             merSvg.append('path')
                 .datum(countriesMesh)
                 .attr('class', 'outline');
-        
-            var equalSvg = d3.select('#equalEarth');
-            var equalWidth = equalSvg.attr('width');
-            var equalHeight = equalSvg.attr('height');
+
+        // equal projection 
             var equalProj = d3.geoEqualEarth().fitSize([equalWidth,equalHeight],countries);
             var equalPath = d3.geoPath().projection(equalProj);
             equalSvg.append("path")
@@ -78,6 +88,22 @@
                 .attr('class', 'country')
                 .attr('d', equalPath);
             equalSvg.append('path')
+                .datum(countriesMesh)
+                .attr('class', 'outline'); 
+
+        // conic projection
+            var conicProj = d3.geoConicEqualArea().fitSize([conicWidth,conicHeight],countries);
+            var conicPath = d3.geoPath().projection(conicProj);
+            conicSvg.append("path")
+                .attr('class', 'graticule')
+                .attr('d', conicPath(d3.geoGraticule10()));
+            conicSvg.selectAll('path')
+                .data(countries.features)
+                .enter()
+                .append('path')
+                .attr('class', 'country')
+                .attr('d', conicPath);
+            conicSvg.append('path')
                 .datum(countriesMesh)
                 .attr('class', 'outline'); 
 
