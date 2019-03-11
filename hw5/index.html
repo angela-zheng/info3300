@@ -23,7 +23,7 @@
     </style>
 </head>
 <body>
-    <p id='q3'>
+    <p id='q1'>
         <svg id='mercator' width=600 height=400>
         </svg>
         <p id='1D'>
@@ -37,81 +37,134 @@
         <p id='1F'>
                 write about 3 sentences identifying a) an advantage of this Conic projection, b) a draw-back of this projection or places where it might be misleading, and c) a specific example use case for which it would be well suited.
         </p>
+        <script>
+                // 1A
+                        const error = "Error detected";
+                        var merSvg = d3.select('#mercator');
+                        var merWidth = merSvg.attr('width');
+                        var merHeight = merSvg.attr('height');
+                
+                        var equalSvg = d3.select('#equalEarth');
+                        var equalWidth = equalSvg.attr('width');
+                        var equalHeight = equalSvg.attr('height');
+                
+                        var conicSvg = d3.select('#conicEqualArea');
+                        var conicWidth = conicSvg.attr('width');
+                        var conicHeight = conicSvg.attr('height');
+                
+                        var world = d3.json('world_110m.json').then(function(load){
+                            var countries = topojson.feature(load, load.objects.countries);
+                            // console.log(countries);
+                            var countriesMesh = topojson.mesh(load, countries);
+                            // console.log(countriesMesh);
+                            var merProj = d3.geoMercator().fitSize([merWidth, merHeight],countries);
+                            var merPath = d3.geoPath().projection(merProj);
+                
+                // 1C
+                            merSvg.append("path")
+                                .attr('class', 'graticule')
+                                .attr('d', merPath(d3.geoGraticule10()));
+                            merSvg.selectAll('path')
+                                .data(countries.features)
+                                .enter()
+                                .append('path')
+                                .attr('class', 'country')
+                                .attr('d', merPath);
+                            merSvg.append('path')
+                                .datum(countriesMesh)
+                                .attr('class', 'outline');
+                
+                        // equal projection 
+                            var equalProj = d3.geoEqualEarth().fitSize([equalWidth,equalHeight],countries);
+                            var equalPath = d3.geoPath().projection(equalProj);
+                            equalSvg.append("path")
+                                .attr('class', 'graticule')
+                                .attr('d', equalPath(d3.geoGraticule10()));
+                            equalSvg.selectAll('path')
+                                .data(countries.features)
+                                .enter()
+                                .append('path')
+                                .attr('class', 'country')
+                                .attr('d', equalPath);
+                            equalSvg.append('path')
+                                .datum(countriesMesh)
+                                .attr('class', 'outline'); 
+                
+                        // conic projection
+                            var conicProj = d3.geoConicEqualArea().fitSize([conicWidth,conicHeight],countries);
+                            var conicPath = d3.geoPath().projection(conicProj);
+                            conicSvg.append("path")
+                                .attr('class', 'graticule')
+                                .attr('d', conicPath(d3.geoGraticule10()));
+                            conicSvg.selectAll('path')
+                                .data(countries.features)
+                                .enter()
+                                .append('path')
+                                .attr('class', 'country')
+                                .attr('d', conicPath);
+                            conicSvg.append('path')
+                                .datum(countriesMesh)
+                                .attr('class', 'outline'); 
+                
+                        }).catch(function(e){
+                            console.log("Error: "+e.message)
+                            throw new Error(error);
+                        });
+                
+                    </script>
     </p>
-    <script>
-// 1A
-        const error = "Error detected";
-        var merSvg = d3.select('#mercator');
-        var merWidth = merSvg.attr('width');
-        var merHeight = merSvg.attr('height');
+    <p id='q2'>
+        <svg id='nyMap' width=800 height=700></svg>
+        <script>
+            var map = d3.select('#nyMap');
+            var width = map.attr('width');
+            var height = map.attr('height');
+            
+            // color scale construction 
+            var colorScale = d3.scaleLinear()
+                .domain([30,50,70])
+                .range(['red','lightgrey', 'blue']);
+                // .clamp(true);
+                // .interpolate(d3.interpolateHcl);
 
-        var equalSvg = d3.select('#equalEarth');
-        var equalWidth = equalSvg.attr('width');
-        var equalHeight = equalSvg.attr('height');
+            var nyd = d3.json('new_york_districts.json').then(function(data){
+                var districts = topojson.feature(data, data.objects.districts);
+                var nyProj = d3.geoMercator().fitSize([width,height],districts);
+                var nyPath = d3.geoPath().projection(nyProj);
 
-        var conicSvg = d3.select('#conicEqualArea');
-        var conicWidth = conicSvg.attr('width');
-        var conicHeight = conicSvg.attr('height');
+                // draw map 
+                map.selectAll('path')
+                    .data(districts.features)
+                    .enter()
+                    .append('path')
+                    .attr('d',nyPath)
+                    .attr('class','.district')
+                    .attr('style', 'stroke:white;stroke-width:1')
+                    .attr('fill', function(d){
+                        // console.log(d.properties.percent_trump);
+                        // console.log(colorScale(d.properties.percent_trump));
+                        return colorScale(d.properties.percent_trump);
+                    });
+                
+    // Part E   
+                var ithaca = nyProj([-76.5,42.443333]);
+                console.log(ithaca);
+                
+                map.append('circle')
+                    .attr('r', 10)
+                    .attr('cx', ithaca[0])
+                    .attr('cy', ithaca[1])
+                    .attr('style', 'fill:white')
+                    // .attr('transform', function(d){
+                    //    return 'translate('+ithaca+')';
+                    // })
+                    ;
 
-        var world = d3.json('world_110m.json').then(function(load){
-            var countries = topojson.feature(load, load.objects.countries);
-            // console.log(countries);
-            var countriesMesh = topojson.mesh(load, countries);
-            // console.log(countriesMesh);
-            var merProj = d3.geoMercator().fitSize([merWidth, merHeight],countries);
-            var merPath = d3.geoPath().projection(merProj);
-
-// 1C
-            merSvg.append("path")
-                .attr('class', 'graticule')
-                .attr('d', merPath(d3.geoGraticule10()));
-            merSvg.selectAll('path')
-                .data(countries.features)
-                .enter()
-                .append('path')
-                .attr('class', 'country')
-                .attr('d', merPath);
-            merSvg.append('path')
-                .datum(countriesMesh)
-                .attr('class', 'outline');
-
-        // equal projection 
-            var equalProj = d3.geoEqualEarth().fitSize([equalWidth,equalHeight],countries);
-            var equalPath = d3.geoPath().projection(equalProj);
-            equalSvg.append("path")
-                .attr('class', 'graticule')
-                .attr('d', equalPath(d3.geoGraticule10()));
-            equalSvg.selectAll('path')
-                .data(countries.features)
-                .enter()
-                .append('path')
-                .attr('class', 'country')
-                .attr('d', equalPath);
-            equalSvg.append('path')
-                .datum(countriesMesh)
-                .attr('class', 'outline'); 
-
-        // conic projection
-            var conicProj = d3.geoConicEqualArea().fitSize([conicWidth,conicHeight],countries);
-            var conicPath = d3.geoPath().projection(conicProj);
-            conicSvg.append("path")
-                .attr('class', 'graticule')
-                .attr('d', conicPath(d3.geoGraticule10()));
-            conicSvg.selectAll('path')
-                .data(countries.features)
-                .enter()
-                .append('path')
-                .attr('class', 'country')
-                .attr('d', conicPath);
-            conicSvg.append('path')
-                .datum(countriesMesh)
-                .attr('class', 'outline'); 
-
-        }).catch(function(e){
-            console.log("Error: "+e.message)
-            throw new Error(error);
-        });
-
-    </script>
+            }).catch(function(e){
+                console.log("error: "+e.message);
+                throw new Error(error);
+            })
+        </script>
+    </p>
 </body>
 </html>
