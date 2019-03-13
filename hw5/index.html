@@ -20,22 +20,37 @@
             fill:none;
             stroke:lightgrey;
         }
+        .answer, h1, h2, h3 {
+            width: 50%;
+            padding:3%;
+            display:block;
+            font-family:Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 15px;
+            line-height:50px;
+        }
+        h1 {
+            font-size:32px;
+        }
+        svg {
+            padding:5%;
+        }
     </style>
 </head>
 <body>
+    <h1>Homework 5</h1> 
     <p id='q1'>
         <svg id='mercator' width=600 height=400>
         </svg>
-        <p id='1D'>
-            3 sentences identifying a) an advantage of this Mercator projection, b) a potential draw-back of this projection or places where it might be misleading, and c) a specific example use case for which it would be well suited.
+        <p id='1D' class='answer'>
+            An advantage of this projection is that its very easy to see all the countries and that there is even spacing around the equator; however, it countries towards the top and bottom or distorted, which gives the illusion that Greenland and Antarctica are bigger than the actually are in relation to other countries. This projection can be suited to showing data concentrated around the equator, such as color-coded population concentrations for the United States in relation to that of Europe. 
         </p>
         <svg id='equalEarth' width=600 height=400></svg>
-        <p id='1E'>
-                write about 3 sentences identifying a) an advantage of this Equal Earth projection, b) a draw-back of this projection or places where it might be misleading, and c) a specific example use case for which it would be well suited.
+        <p id='1E' class='answer'>
+            The equal earth projection shows all the countries well-proportioned in relation to one another, with good relative distances. However, parts of countries at the top and bottom are shaved off as the tops and bottoms of the globe are note seen. This projection can be usefull in illustrating distances travelled between countries such as migration patterns of birds or airplane routes. 
         </p>
         <svg id='conicEqualArea' width=600 height=400></svg>
-        <p id='1F'>
-                write about 3 sentences identifying a) an advantage of this Conic projection, b) a draw-back of this projection or places where it might be misleading, and c) a specific example use case for which it would be well suited.
+        <p id='1F' class='answer'>
+            This projection is good for illustrating equal longitude lines, which means that it can be helpful in displaying horizontal distances between countries; however, it also creates a lot of distortion for countries towards the top and bottom as Antarctica is completey cut off. This projection could be useful in showing distances from the United States to China as compared the distance from the United States to Europe as long as the distances are measured horizontally rather than vertically 
         </p>
         <script>
                 // 1A
